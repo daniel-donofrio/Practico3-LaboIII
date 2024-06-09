@@ -45,7 +45,7 @@ public class ClienteService {
         clienteDao.save(titular);
     }
 
-    public Cliente buscarClientePorDni(long dni) {
+    public Cliente buscarClientePorDni(long dni) throws IllegalArgumentException {
         Cliente cliente = clienteDao.find(dni, true);
         if(cliente == null) {
             throw new IllegalArgumentException("El cliente no existe");
