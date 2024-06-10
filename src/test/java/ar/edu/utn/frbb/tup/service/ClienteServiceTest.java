@@ -124,6 +124,10 @@ public class ClienteServiceTest {
 
     }
 
+
+
+
+
     //Agregar una CA$ y CC$ --> success 2 cuentas, titular peperino
     @Test
     public void testAgregarCAyCCSuccess() throws TipoCuentaAlreadyExistsException {
@@ -217,6 +221,14 @@ public class ClienteServiceTest {
         pepeRino.setFechaNacimiento(LocalDate.of(1978, 3, 25));
         pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
+        //tenemos que mokear el clienteDao
+
+        ClienteDao clienteDao = mock(ClienteDao.class);
+        // Configurar el mock para que lance una excepción cuando se busque el cliente por DNI
+        when(clienteDao.find(pepeRino.getDni(), true)).thenThrow(new IllegalArgumentException("El cliente no se encontro"));
+        //inyectasmos el mock en el ClienteService
+        ClienteService clienteService = new ClienteService(clienteDao);
+        //ahora verificamos la excepcion cuando se busca el cliente que no existe
         assertThrows(IllegalArgumentException.class, () -> clienteService.buscarClientePorDni(pepeRino.getDni()));
     }
 }
