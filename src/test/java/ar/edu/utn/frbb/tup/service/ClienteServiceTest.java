@@ -214,6 +214,7 @@ public class ClienteServiceTest {
 
     @Test
     public void testBuscarPorDniException() throws IllegalArgumentException {
+
         Cliente pepeRino = new Cliente();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -224,11 +225,11 @@ public class ClienteServiceTest {
         //tenemos que mokear el clienteDao
 
         ClienteDao clienteDao = mock(ClienteDao.class);
-        // Configurar el mock para que lance una excepción cuando se busque el cliente por DNI
-        when(clienteDao.find(pepeRino.getDni(), true)).thenThrow(new IllegalArgumentException("El cliente no se encontro"));
+
         //inyectasmos el mock en el ClienteService
         ClienteService clienteService = new ClienteService(clienteDao);
         //ahora verificamos la excepcion cuando se busca el cliente que no existe
-        assertThrows(IllegalArgumentException.class, () -> clienteService.buscarClientePorDni(pepeRino.getDni()));
+        long Dni = 26456439;
+        assertThrows(IllegalArgumentException.class, () -> clienteService.buscarClientePorDni(Dni));
     }
 }
