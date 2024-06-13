@@ -83,31 +83,31 @@ public class CuentaServiceTest {
 
     @Test
     public void testTipoCuentaAlreadyExistsException() throws TipoCuentaAlreadyExistsException {
-        Cliente luciano = new Cliente();
-        luciano.setDni(26456439);
-        luciano.setNombre("Pepe");
-        luciano.setApellido("Rino");
-        luciano.setFechaNacimiento(LocalDate.of(1978, 3, 25));
-        luciano.setTipoPersona(TipoPersona.PERSONA_FISICA);
+        Cliente pepeRino = new Cliente();
+        pepeRino.setDni(26456439);
+        pepeRino.setNombre("Pepe");
+        pepeRino.setApellido("Rino");
+        pepeRino.setFechaNacimiento(LocalDate.of(1978, 3, 25));
+        pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
         Cuenta cuenta = new Cuenta()
                 .setMoneda(TipoMoneda.PESOS)
                 .setBalance(500000)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        when(clienteDao.find(26456439, true)).thenReturn(luciano);
+        when(clienteDao.find(26456439, true)).thenReturn(pepeRino);
 
-        clienteService.agregarCuenta(cuenta, luciano.getDni());
+        clienteService.agregarCuenta(cuenta, pepeRino.getDni());
 
         Cuenta cuenta2 = new Cuenta()
                 .setMoneda(TipoMoneda.PESOS)
                 .setBalance(500000)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        assertThrows(TipoCuentaAlreadyExistsException.class, () -> clienteService.agregarCuenta(cuenta2, luciano.getDni()));
-        verify(clienteDao, times(1)).save(luciano);
-        assertEquals(1, luciano.getCuentas().size());
-        assertEquals(luciano, cuenta.getTitular());
+        assertThrows(TipoCuentaAlreadyExistsException.class, () -> clienteService.agregarCuenta(cuenta2, pepeRino.getDni()));
+        verify(clienteDao, times(1)).save(pepeRino);
+        assertEquals(1, pepeRino.getCuentas().size());
+        assertEquals(pepeRino, cuenta.getTitular());
     }
 
     @Test
@@ -127,8 +127,11 @@ public class CuentaServiceTest {
         when(clienteDao.find(26456439, true)).thenReturn(pepeRino);
 
         clienteService.agregarCuenta(cuenta, pepeRino.getDni());
-        verify(cuentaDao, times(1)).save(cuenta);
 
+        verify(clienteDao, times(1)).save(pepeRino);
+
+        assertEquals(1, pepeRino.getCuentas().size());
+        assertEquals(pepeRino, cuenta.getTitular());
     }
 
 }
