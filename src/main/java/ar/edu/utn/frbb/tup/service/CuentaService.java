@@ -1,8 +1,11 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.TipoCuenta;
+import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNoSoportadaException;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,16 +26,32 @@ public class CuentaService {
     //    3 - cliente ya tiene cuenta de ese tipo
     //    4 - cuenta creada exitosamente
 
-    public void darDeAltaCuenta(Cuenta cuenta, long dniTitular) throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException {
+    public void darDeAltaCuenta(Cuenta cuenta, long dniTitular) throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNoSoportadaException {
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }
 
         //Chequear cuentas soportadas por el banco CA$ CC$ CAU$S
-        // if (!tipoCuentaEstaSoportada(cuenta)) {...}
+        if (!tipoCuentaEstaSoportada(cuenta)) {
+            throw new TipoCuentaNoSoportadaException ("La cuenta " + cuenta.getTipoCuenta() + " no esta soportada por el banco.");
+        }
 
         clienteService.agregarCuenta(cuenta, dniTitular);
         cuentaDao.save(cuenta);
+    }
+
+    public boolean tipoCuentaEstaSoportada(Cuenta cuenta) {
+        if (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && cuenta.getMoneda() == TipoMoneda.PESOS) {
+                return true;
+        } else if (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && cuenta.getMoneda() == TipoMoneda.DOLARES) {
+            return true;
+        } else if (cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE && cuenta.getMoneda() == TipoMoneda.PESOS) {
+            return true;
+        }
+        else
+        {
+          return false;
+        }
     }
 
     public Cuenta find(long id) {
